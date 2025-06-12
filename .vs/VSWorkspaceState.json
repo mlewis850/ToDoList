@@ -1,0 +1,15 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\.angular",
+    "\\.angular\\cache",
+    "\\.angular\\cache\\19.2.15",
+    "\\.angular\\cache\\19.2.15\\ToDoList",
+    "\\.angular\\cache\\19.2.15\\ToDoList\\vite",
+    "\\.angular\\cache\\19.2.15\\ToDoList\\vite\\deps_ssr",
+    "\\src",
+    "\\src\\app"
+  ],
+  "SelectedNode": "\\.angular\\cache\\19.2.15\\ToDoList\\vite\\deps_ssr\\package.json",
+  "PreviewInSolutionExplorer": false
+}
