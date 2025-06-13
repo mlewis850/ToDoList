@@ -1,0 +1,9 @@
+<!-- <ul> -->
+<!-- <li *ngFor="let item of items">{{ item }}</li> -->
+<div *ngFor="let item of items; index as i">
+    <input type="checkbox" id={item} name={item} value={item}>
+    <!-- <label for={item}>{{item}}</label><br> -->
+    <input for={item} [value]="items[i]" (change)="editItem(i, $event)" /><br>
+</div>
+<!-- </ul> -->
+<button (click)="addItem('New Todo')">+ Add Todo</button>
