@@ -1,15 +1,16 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
     selector: 'todo-list',
     templateUrl: './todoList.component.html',
     styleUrls: ['./todoList.component.css'],
-    imports: [CommonModule]
+    imports: [CommonModule, CdkDrag, CdkDropList]
 })
 export class TodoListComponent {
-    public items = ['Don\'t use me'];
+    public items: string[] = [];
 
     constructor(private http: HttpClient) { }
 
@@ -40,6 +41,14 @@ export class TodoListComponent {
         );
     }
 
+    public getTodoItems(): string[] {
+        return this.items;
+    }
+
+    public getCompletedItems(): string[] {
+        return this.items;
+    }
+
     public editItem(index: number, event: Event): void {
         const newValue = (event.target as HTMLInputElement).value;
         console.log(`Editing item at index ${index} to new value: ${newValue}`);
@@ -48,5 +57,16 @@ export class TodoListComponent {
 
     public addItem(newItem: string): void {
         this.items.push(newItem);
+    }
+
+    public deleteItem(index: number): void {
+        console.log(`Deleting item at index ${index}`);
+        this.items.splice(index, 1);
+    }
+
+    drop(event: CdkDragDrop<string[]>) {
+        console.log('Drop event:', event.previousIndex, event.currentIndex);
+        moveItemInArray(this.items, event.previousIndex, event.currentIndex);
+        console.log('Items after drop:', this.items);
     }
 }

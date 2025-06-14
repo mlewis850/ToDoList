@@ -1,9 +1,22 @@
-<!-- <ul> -->
-<!-- <li *ngFor="let item of items">{{ item }}</li> -->
-<div *ngFor="let item of items; index as i">
-    <input type="checkbox" id={item} name={item} value={item}>
-    <!-- <label for={item}>{{item}}</label><br> -->
-    <input for={item} [value]="items[i]" (change)="editItem(i, $event)" /><br>
+<div class="horizontal">
+    <div class="section-header">Todo</div>
+    <button class="add-todo-button" (click)="addItem('New Todo')">+ Add Todo</button>
 </div>
-<!-- </ul> -->
-<button (click)="addItem('New Todo')">+ Add Todo</button>
+
+<div cdkDropList class="todo-list" (cdkDropListDropped)="drop($event)">
+    <div *ngFor="let item of getTodoItems(); index as i" class="todo-item" cdkDrag>
+        <input type="checkbox" id={item} name={item} value={item}>
+        <input for={item} [value]="items[i]" (change)="editItem(i, $event)" /><br>
+        <div class="drag-handle">⋮⋮</div>
+    </div>
+</div>
+
+<div class="section-header space-above">Done</div>
+
+<div class="todo-list">
+    <div *ngFor="let item of getCompletedItems(); index as i" class="todo-item">
+        <input type="checkbox" id={item} name={item} value={item} checked="true">
+        <label class="completed-label" for={item}>{{ items[i] }}</label><br>
+        <button class="delete-button" (click)="deleteItem(i)">Delete</button>
+    </div>
+</div>
