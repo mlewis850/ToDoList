@@ -60,21 +60,20 @@
 .delete-button {
     margin-left: 8px;
     padding: 4px 8px;
-    background-color: #dc3545;
-    color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-weight: bold;
 }
 
-input {
+.input {
     height: 16px;
     border: none;
     width: 100%;
     font-size: 14px;
 }
 
-input[type="checkbox"] {
+.checkbox {
     width: 16px;
     height: 16px;
     margin-right: 8px;

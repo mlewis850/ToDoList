@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { TodoItem } from '../model/todoItem';
 
 @Component({
     selector: 'todo-list',
@@ -10,7 +11,7 @@ import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk
     imports: [CommonModule, CdkDrag, CdkDropList]
 })
 export class TodoListComponent {
-    public items: string[] = [];
+    public items: TodoItem[] = [];
 
     constructor(private http: HttpClient) { }
 
@@ -19,10 +20,9 @@ export class TodoListComponent {
     }
 
     public getItemsFromDB() {
-        this.http.get<string[]>("http://localhost:8080/TodoList").subscribe(
-            (data: string[]) => {
-                console.log('GET request successful', data);
-                this.items = data;
+        this.http.get<TodoItem[]>("http://localhost:8080/TodoList").subscribe(
+            (data: TodoItem[]) => {
+                this.items = data.map(item => TodoItem.fromJSON(item));
             },
             (error) => {
                 console.error('Error fetching items from DB', error);
@@ -30,10 +30,10 @@ export class TodoListComponent {
         );
     }
 
-    public sendItemsToDB() {
-        this.http.post<ResponseType>("http://localhost:8080/TodoList", JSON.stringify(this.items), {}).subscribe(
+    public createNewTodoItem() {
+        this.http.post<ResponseType>("http://localhost:8080/TodoList", "", {}).subscribe(
             (response) => {
-                console.log('POST request successful', response);
+                this.getItemsFromDB();
             },
             (error) => {
                 console.error('POST request failed', error);
@@ -41,32 +41,74 @@ export class TodoListComponent {
         );
     }
 
-    public getTodoItems(): string[] {
-        return this.items;
+    public deleteItemsFromDB(id: string) {
+        this.http.delete<ResponseType>(`http://localhost:8080/TodoList`, { params: { id } }).subscribe(
+            (response) => {
+                this.getItemsFromDB();
+            },
+            (error) => {
+                console.error('DELETE request failed', error);
+            }
+        );
     }
 
-    public getCompletedItems(): string[] {
-        return this.items;
+    public updateItemInDB(item: TodoItem) {
+        this.http.put<ResponseType>("http://localhost:8080/TodoList", TodoItem.toJSON(item), {}).subscribe(
+            (response) => {
+                this.getItemsFromDB();
+            },
+            (error) => {
+                console.error('PUT request failed', error);
+            }
+        );
     }
 
-    public editItem(index: number, event: Event): void {
+    public getTodoItems(): TodoItem[] {
+        return this.items.filter(item => !item.completed).sort((a, b) => a.order! - b.order!);
+    }
+
+    public getCompletedItems(): TodoItem[] {
+        return this.items.filter(item => item.completed);
+    }
+
+    public editItem(item: TodoItem, event: Event): void {
         const newValue = (event.target as HTMLInputElement).value;
-        console.log(`Editing item at index ${index} to new value: ${newValue}`);
-        this.items[index] = newValue;
+        item.title = newValue;
+        this.updateItemInDB(item);
     }
 
-    public addItem(newItem: string): void {
-        this.items.push(newItem);
+    public addItem(): void {
+        this.createNewTodoItem();
     }
 
-    public deleteItem(index: number): void {
-        console.log(`Deleting item at index ${index}`);
-        this.items.splice(index, 1);
+    public deleteItem(id: string): void {
+        this.items = this.items.filter(item => item.id !== id);
+        this.deleteItemsFromDB(id);
     }
 
-    drop(event: CdkDragDrop<string[]>) {
-        console.log('Drop event:', event.previousIndex, event.currentIndex);
-        moveItemInArray(this.items, event.previousIndex, event.currentIndex);
-        console.log('Items after drop:', this.items);
+    public drop(event: CdkDragDrop<TodoItem[]>) {
+        this.swapItems(event.previousIndex, event.currentIndex);
+        // const todos = this.getTodoItems();
+        // moveItemInArray(todos, event.previousIndex, event.currentIndex);
+        // for (let i = 0; i < todos.length; i++) {
+        //     todos[i].order = i;
+        // }
+        // todos.forEach(item => this.updateItemInDB(item));
+    }
+
+    public swapItems(index1: number, index2: number): void {
+        const todos = this.getTodoItems();
+        moveItemInArray(todos, index1, index2);
+        for (let i = 0; i < todos.length; i++) {
+            todos[i].order = i;
+        }
+        todos.forEach(item => this.updateItemInDB(item));
+    }
+
+    public toggleCompletion(item: TodoItem): void {
+        item.completed = !item.completed;
+        if (!item.completed) item.order = Math.max(...this.getTodoItems().map(i => i.order!)) + 1;
+        else item.order = -1;
+        this.updateItemInDB(item);
     }
 }

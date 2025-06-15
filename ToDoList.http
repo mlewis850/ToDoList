@@ -12,4 +12,9 @@ Accept: application/json
 POST {{ToDoList_HostAddress}}/todoList/
 Accept: application/json
 
+DELETE {{ToDoList_HostAddress}}/todoList/:id
+Accept: application/json
+
+PUT {{ToDoList_HostAddress}}/todoList/
+
 ###
