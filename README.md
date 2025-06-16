@@ -21,3 +21,26 @@ docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Password1!" \
 ### Connect to MySQL container
 docker exec -it sql1 "bash"
 /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P "Password1!" -C
+
+
+### Run C# unit tests
+dotnet test
+
+### Run Angular unit tests
+ng test
+
+
+### Setting up database with data
+CREATE DATABASE Todo;
+
+USE Todo;
+
+CREATE TABLE TodoList (
+    id VARCHAR(36),
+    title NVARCHAR(150),
+    checked BIT,
+    ordering INT,
+);
+
+INSERT INTO TodoList
+VALUES ("1", "Create a todo list app", 0, 0);
