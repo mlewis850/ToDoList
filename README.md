@@ -18,6 +18,8 @@ docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Password1!" \
    -p 1433:1433 --name sql1 --hostname sql1 \
    mcr.microsoft.com/mssql/server:2025-latest
 
+docker-compose up
+
 ### Connect to MySQL container
 docker exec -it sql1 "bash"
 /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P "Password1!" -C

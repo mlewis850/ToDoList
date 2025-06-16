@@ -1,7 +1,7 @@
 services:
 
   sql1:
-    image: mcr.microsoft.com/dotnet/sdk:9.0@sha256:3fcf6f1e809c0553f9feb222369f58749af314af6f063f389cbd2f913b4ad556
+    image: todo-backend
     environment:
       - SA_PASSWORD=Password1!
       - ACCEPT_EULA=Y
