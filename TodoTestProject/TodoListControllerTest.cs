@@ -4,15 +4,18 @@ using Microsoft.Extensions.Logging;
 using ToDoList.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Nodes;
+using Microsoft.EntityFrameworkCore;
 
 public class TodoListControllerTest
 {
+    private const string ConnectionString = @"Server=(localdb)\mssqllocaldb;Database=TestDb;Trusted_Connection=True;ConnectRetryCount=0";
+
     /// <summary>
     /// Creates a new in-memory TodoContext and seeds it with two TodoItem objects for testing.
     /// </summary>
     private TodoContext CreateInMemoryContext()
     {
-        var context = new TodoContext();
+        var context = new TodoContext(ConnectionString);
 
         context.Database.Delete();
 
