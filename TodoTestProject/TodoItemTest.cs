@@ -3,6 +3,9 @@ using System.Text.Json.Nodes;
 
 public class TodoItemTest
 {
+    /// <summary>
+    /// Tests that the TodoItem constructor correctly sets all properties.
+    /// </summary>
     [Fact]
     public void ConstructorSetsPropertiesCorrectly()
     {
@@ -14,6 +17,9 @@ public class TodoItemTest
         Assert.Equal(7, item.Order);
     }
 
+    /// <summary>
+    /// Tests that FromJson creates a TodoItem with the correct values from a JsonObject.
+    /// </summary>
     [Fact]
     public void FromJsonCreatesTodoItemFromJsonObject()
     {
@@ -33,6 +39,9 @@ public class TodoItemTest
         Assert.Equal(5, item.Order);
     }
 
+    /// <summary>
+    /// Tests that ToJson creates a JsonObject with the correct values from a TodoItem.
+    /// </summary>
     [Fact]
     public void ToJsonCreatesJsonObjectFromTodoItem()
     {

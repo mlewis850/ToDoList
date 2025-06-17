@@ -1,90 +1,87 @@
+using System.Data.Entity.Migrations;
 using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc;
-using MySql.Data.MySqlClient;
-
 namespace ToDoList.Controllers;
 
+/// <summary>
+/// Controller for managing Todo list items via REST API endpoints.
+/// </summary>
 [ApiController]
 [Route("[controller]")]
 public class TodoListController : ControllerBase
 {
     private readonly ILogger<TodoListController> _logger;
-    private Random _rnd = new Random();
+    private readonly TodoContext db;
 
-    public TodoListController(ILogger<TodoListController> logger)
+    /// <summary>
+    /// Initializes a new instance of the TodoListController.
+    /// Accepts a logger and an optional TodoContext (for testing or dependency injection).
+    /// </summary>
+    public TodoListController(ILogger<TodoListController> logger, TodoContext context = null)
     {
         _logger = logger;
+        db = context ?? new TodoContext();
     }
 
+    /// <summary>
+    /// Gets all todo items from the database, ordered by their 'Order' property.
+    /// Returns each item as a JsonObject.
+    /// </summary>
     [HttpGet(Name = "GetTodoList")]
     public IEnumerable<JsonObject> Get()
     {
-        string connectionString = "datasource=127.0.0.1; port=1433; database=Todo; username=SA; password=Password1!;";
-        MySqlConnection databaseConnection = new MySqlConnection(connectionString);
+        var query = from t in db.Todos
+                    orderby t.Order
+                    select t;
 
-        string myConnectionString = "server=localhost; port=1433; uid=SA; password=Password1!; database=Todo; SslMode=none;";
-        MySqlConnection myConnection = new MySqlConnection(myConnectionString);
-        try
-        {
-            myConnection.Open();
-            // databaseConnection.Open();
-        }
-        catch (Exception error)
-        {
-            _logger.LogError("Database connection failed: {Error}", error.Message);
-            // todo leave
-            return null;
-        }
-        _logger.LogInformation("Database connection established successfully.");
-
-        // string query = "SELECT * FROM TodoList;";
-        // MySqlCommand commandDatabase = new MySqlCommand(query, myConnection);
-
-        // MySqlDataReader reader = commandDatabase.ExecuteReader();
-
-        // while (reader.Read())
-        // {
-        //     _logger.LogInformation(reader.ToString());
-        // }
-
-
-        // SELECT * FROM TodoList;
-
-        return TodoItem.testData.Select(item => TodoItem.ToJson(item));
+        return query.ToArray().Select(TodoItem.ToJson);
     }
 
+    /// <summary>
+    /// Adds a new todo item to the database with default values.
+    /// Returns a CreatedAtActionResult with the new item.
+    /// </summary>
     [HttpPost(Name = "AddTodoItem")]
     public IActionResult Post()
     {
-        // INSERT INTO TodoList
-        // VALUES (todoItem.id, todoItem.title, todoItem.isCompleted, todoItem.order);
-
+        var query = from t in db.Todos
+                    orderby t.Order
+                    select t;
         Guid id = Guid.NewGuid();
-        int maxOrder = TodoItem.testData.Length > 0 ? TodoItem.testData.Max(item => item.Order) : 0;
+        int maxOrder = query.Count() > 0 ? query.Max(item => item.Order) : 0;
+        TodoItem newItem = db.Todos.Create();
+        newItem.Title = "New task";
         TodoItem todoItem = new TodoItem(id.ToString(), "New Task", false, maxOrder + 1);
-        TodoItem.testData = TodoItem.testData.Append(todoItem).ToArray();
+        db.Todos.Add(todoItem);
+        db.SaveChanges();
+
         return CreatedAtAction(nameof(Get), new { id }, todoItem);
     }
 
+    /// <summary>
+    /// Deletes a todo item from the database by its ID.
+    /// Returns OkResult on success.
+    /// </summary>
     [HttpDelete(Name = "DeleteTodoItem")]
     public IActionResult Delete(string id)
     {
-        // DELETE FROM TodoList WHERE id = 'id';
+        db.Todos.RemoveRange(db.Todos.Where(item => item.Id == id));
+        db.SaveChanges();
 
-        TodoItem.testData = TodoItem.testData.ToList().Where(item => item.Id != id).ToArray();
         return Ok();
     }
 
+    /// <summary>
+    /// Updates an existing todo item in the database using data from a JsonObject.
+    /// Returns OkResult on success.
+    /// </summary>
     [HttpPut(Name = "UpdateTodoItem")]
     public IActionResult Put([FromBody] JsonObject json)
     {
-        // UPDATE TodoList
-        // SET title = newItem.Title, checked = newItem.IsCompleted, ordering = newItem.Order
-        // WHERE id = 'newItem.id';
-
         TodoItem newItem = TodoItem.FromJson(json);
 
-        TodoItem.testData = TodoItem.testData.Select(item => item.Id == newItem.Id ? newItem : item).ToArray();
+        db.Todos.AddOrUpdate(newItem);
+        db.SaveChanges();
 
         return Ok();
     }

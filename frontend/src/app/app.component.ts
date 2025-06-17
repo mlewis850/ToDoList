@@ -10,5 +10,4 @@ import { TodoListComponent } from '../todo-list/todoList.component';
 })
 export class AppComponent {
   title = 'ToDoList';
-  public items = ['Todo 1', 'Todo 2', 'Todo 3'];
 }

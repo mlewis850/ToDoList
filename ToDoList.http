@@ -1,11 +1,5 @@
 @ToDoList_HostAddress = http://localhost:8080
 
-GET {{ToDoList_HostAddress}}/weatherforecast/
-Accept: application/json
-
-POST {{ToDoList_HostAddress}}/weatherforecast/
-Accept: application/json
-
 GET {{ToDoList_HostAddress}}/todoList/
 Accept: application/json
 

@@ -2,7 +2,7 @@
 To run the frontend locally, run `ng serve` while in the /frontend folder
 
 To run the frontend in a docker container run the following commands
-docker build -t todo-angular /frontend
+docker build -t todo-angular ./frontend
 docker run -p 4201:4200 todo-angular
 
 ### Backend
@@ -52,3 +52,12 @@ CREATE TABLE TodoList (
 
 INSERT INTO TodoList
 VALUES ("1", "Create a todo list app", 0, 0);
+
+
+
+Extend DBContext from entity framwork
+virtual DBSet<TodoItem> Todos;
+[Key] specifies primary key
+make migration script
+Tim Corey on youtube
+Neil cummings on udemy building .net from scratch
